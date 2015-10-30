@@ -22,6 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="generic_crawler_module.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Web_Scrapper_Generic.py" />
     <Compile Include="Web_Scrapper_Generic_UI.py" />
   </ItemGroup>
