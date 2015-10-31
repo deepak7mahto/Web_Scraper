@@ -1,6 +1,6 @@
 from PyQt4 import Qt, QtCore, QtGui
 from PyQt4.QtCore import SIGNAL, QThread
-from mechanize import Browser
+import mechanize
 from bs4 import BeautifulSoup
 import Web_Scrapper_Generic_UI, lxml, re
 
@@ -15,10 +15,12 @@ class spidy(object):
         print "get links function"
         self.url_lineEdit.setPlaceholderText("Enter URL ")
         self.url_pattern_lineEdit.setPlaceholderText("Enter URL pattern")        
-        self.connect(self.absolute_url_radioButton , SIGNAL("clicked()"), self.url_type_a)
-        self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)        
+               
         self.connect(self.actionSave_Configuration_File, SIGNAL("triggered()"), self.save_configuration_button)
         self.connect(self.actionLoad_Configuration_File, SIGNAL("triggered()"), self.load_configuration_button)
+
+        self.connect(self.absolute_url_radioButton , SIGNAL("clicked()"), self.url_type_a)
+        self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)
 
     def url_type_a(self):
         self.url = self.url_lineEdit.text()
@@ -74,7 +76,7 @@ class spidy_worker(QThread):
     def getting_links_url_a(self, pageURL, url , url_pattern):
         print "\nWorker Thread Getting Links A from : "+self.url+"\n"
         global pages
-        br = Browser()
+        br = mechanize.Browser()
         try:
             br.open((url+pageURL))
             bsObj = BeautifulSoup(br.response(), "lxml")
@@ -99,5 +101,37 @@ class spidy_worker(QThread):
 
 
     def getting_links_url_b(self, pageURL, url , url_pattern):
-        print "Worker Threa Getting Links B"
+        print "Worker Thread Getting Links B"
         global pages
+        br = mechanize.Browser()
+        br.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 5.1; rv:14.0) Gecko/20100101 Firefox/14.0.1')]
+        try:
+            br.open((url+pageURL))
+            print url+pageURL
+            bsObj = BeautifulSoup(br.response(), "lxml")
+            print bsObj.prettify().encode("utf-8")
+            """
+            for link in bsObj.findAll("a"):
+               if 'href' in link.attrs:
+                   if link.attrs['href'] not in pages:
+                       #to_text = open(file_name, 'a')
+                       newPage = link.attrs['href']
+                       if url not in newPage:
+                           to_be_written = url+newPage[1:]+'\n'
+                       elif url in newPage:
+                           to_be_written = newPage+'\n'
+                       print to_be_written
+                       if url_pattern in newPage:
+                           to_result = '\nLink found ----->\n\n'+newPage
+                       print to_result
+                       #to_text.writelines((newPage+"\n"))                     
+                       #to_text.close()
+                       pages.add(newPage)
+                       self.getting_links_url_a(newPage, url, url_pattern)    
+                   else:
+                       return;
+               else:
+                   return;
+               """                
+        except Exception as e:
+            print e
