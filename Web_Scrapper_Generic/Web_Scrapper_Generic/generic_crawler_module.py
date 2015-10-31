@@ -20,19 +20,31 @@ class spidy(object):
         self.connect(self.actionLoad_Configuration_File, SIGNAL("triggered()"), self.load_configuration_button)
 
         self.connect(self.absolute_url_radioButton , SIGNAL("clicked()"), self.url_type_a)
-        self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)
+        self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)        
 
     def url_type_a(self):
         self.url = self.url_lineEdit.text()
         self.url_pattern = self.url_pattern_lineEdit.text()
-        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeA")
+        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeA", "")
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
         
     def url_type_r(self):
+
+        self.base_url_button_label = QtGui.QLabel()
+        self.base_url_button_label.setText("Base URL")
+        
+        self.base_url_button_lineEdit = QtGui.QLineEdit()
+        self.base_url_button_lineEdit.setPlaceholderText("Enter Base URL")
+        
+        self.gridLayout.addWidget(self.base_url_button_label, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.base_url_button_lineEdit, 1, 2, 1, 1)        
+
         self.url = self.url_lineEdit.text()
         self.url_pattern = self.url_pattern_lineEdit.text()
-        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeB")
+        self.base_url = self.base_url_button_lineEdit.text()
+
+        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeB", self.base_url)
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
 
@@ -55,23 +67,25 @@ class spidy(object):
         file.close()
 
 class spidy_worker(QThread):
-    def __init__(self, url, url_pattern, url_type):
+    def __init__(self, url, url_pattern, url_type, base_url):
         QThread.__init__(self)
         print "Spidy Initializing"
         self.url = url
         self.url_pattern = url_pattern
         self.url_type = url_type
+        self.base_url = base_url
 
     def run(self):
         print "Running Thread"
         print "URL : "+str(self.url)
         print "URL Pattern : "+str(self.url_pattern)
         print "URL Type : "+str(self.url_type)
+        print "Base URl : "+str(self.base_url)
 
         if self.url_type == "typeA":
             self.getting_links_url_a("" , str(self.url), str(self.url_pattern))
         elif self.url_type == "typeB":
-            self.getting_links_url_b("" , str(self.url), str(self.url_pattern))
+            self.getting_links_url_b("" , str(self.url), str(self.url_pattern), str(self.base_url))
 
     def getting_links_url_a(self, pageURL, url , url_pattern):
         print "\nWorker Thread Getting Links A from : "+self.url+"\n"
@@ -100,7 +114,7 @@ class spidy_worker(QThread):
             print e 
 
 
-    def getting_links_url_b(self, pageURL, url , url_pattern):
+    def getting_links_url_b(self, pageURL, url , url_pattern, base_url):
         print "\nWorker Thread Getting Links B Current URL : "+(url+pageURL)+"\n"
         global pages
         br = mechanize.Browser()
@@ -108,15 +122,15 @@ class spidy_worker(QThread):
         br.set_handle_robots(False)
         try:            
             br = mechanize.Browser()
-            br.open((url+pageURL))   
+            br.open((url+pageURL))
             bsObj = BeautifulSoup(br.response(), "lxml")
             for link in bsObj.findAll("a"):
                 if 'href' in link.attrs:
                     if link.attrs['href'] not in pages:
                         #We have encountered a new page
                         #to_text = open(file_name, 'a')
-                        newPage = link.attrs['href']                    
-                        
+                        newPage = link.attrs['href']
+
                         if url not in newPage:
                             to_be_written = url+newPage[1:]+'\n'
                         elif url in newPage:

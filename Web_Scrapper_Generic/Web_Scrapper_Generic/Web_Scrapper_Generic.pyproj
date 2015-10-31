@@ -22,11 +22,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="examples\e1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="generic_crawler_module.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Web_Scrapper_Generic.py" />
     <Compile Include="Web_Scrapper_Generic_UI.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="examples\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
