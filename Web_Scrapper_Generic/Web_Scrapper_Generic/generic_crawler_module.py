@@ -17,20 +17,40 @@ class spidy(object):
         self.url_pattern_lineEdit.setPlaceholderText("Enter URL pattern")        
         self.connect(self.absolute_url_radioButton , SIGNAL("clicked()"), self.url_type_a)
         self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)        
-        
+        self.connect(self.actionSave_Configuration_File, SIGNAL("triggered()"), self.save_configuration_button)
+        self.connect(self.actionLoad_Configuration_File, SIGNAL("triggered()"), self.load_configuration_button)
+
     def url_type_a(self):
         self.url = self.url_lineEdit.text()
         self.url_pattern = self.url_pattern_lineEdit.text()
         self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeA")
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
-        self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.terminate)
+        self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
         
     def url_type_r(self):
         self.url = self.url_lineEdit.text()
         self.url_pattern = self.url_pattern_lineEdit.text()
         self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeB")
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
-        self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.terminate)
+        self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
+
+    def stop_crawler_button(self):
+        print "Stopping Crawler"
+        self.spidy_object.terminate()
+
+    def load_configuration_button(self):
+        print "Loading Configuration"
+        file = open("config.txt", "r")
+        str(self.url_lineEdit.setText(file.readline()))
+        str(self.url_pattern_lineEdit.setText(file.readline()))
+        file.close()
+
+    def save_configuration_button(self):
+        print "Saving Configuration"
+        file = open("config.txt", "w")
+        file.write(str(self.url_lineEdit.text())+"\n")
+        file.write(str(self.url_pattern_lineEdit.text()))
+        file.close()
 
 class spidy_worker(QThread):
     def __init__(self, url, url_pattern, url_type):
@@ -52,7 +72,7 @@ class spidy_worker(QThread):
             self.getting_links_url_b("" , str(self.url), str(self.url_pattern))
 
     def getting_links_url_a(self, pageURL, url , url_pattern):
-        print "Worker Thread Getting Links A : "+self.url
+        print "\nWorker Thread Getting Links A from : "+self.url+"\n"
         global pages
         br = Browser()
         try:
