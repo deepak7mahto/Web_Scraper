@@ -2,7 +2,7 @@ from PyQt4 import Qt, QtCore, QtGui
 from PyQt4.QtCore import SIGNAL, QThread
 import mechanize
 from bs4 import BeautifulSoup
-import Web_Scrapper_Generic_UI, lxml, re
+import Web_Scrapper_Generic_UI, lxml, re, urlparse
 
 pages = set()
 
@@ -31,19 +31,18 @@ class spidy(object):
         
     def url_type_r(self):
 
-        self.base_url_button_label = QtGui.QLabel()
-        self.base_url_button_label.setText("Base URL")
+        #self.base_url_button_label = QtGui.QLabel()
+        #self.base_url_button_label.setText("Base URL")
         
-        self.base_url_button_lineEdit = QtGui.QLineEdit()
-        self.base_url_button_lineEdit.setPlaceholderText("Enter Base URL")
+        #self.base_url_button_lineEdit = QtGui.QLineEdit()
+        #self.base_url_button_lineEdit.setPlaceholderText("Enter Base URL")
         
-        self.gridLayout.addWidget(self.base_url_button_label, 0, 2, 1, 1)
-        self.gridLayout.addWidget(self.base_url_button_lineEdit, 1, 2, 1, 1)        
+        #self.gridLayout.addWidget(self.base_url_button_label, 0, 2, 1, 1)
+        #self.gridLayout.addWidget(self.base_url_button_lineEdit, 1, 2, 1, 1)        
 
-        self.url = self.url_lineEdit.text()
+        self.url = str(self.url_lineEdit.text()).strip("")
         self.url_pattern = self.url_pattern_lineEdit.text()
-        self.base_url = self.base_url_button_lineEdit.text()
-
+        self.base_url = urlparse.urlparse(str(self.url)).hostname
         self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeB", self.base_url)
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
@@ -85,14 +84,15 @@ class spidy_worker(QThread):
         if self.url_type == "typeA":
             self.getting_links_url_a("" , str(self.url), str(self.url_pattern))
         elif self.url_type == "typeB":
-            self.getting_links_url_b("" , str(self.url), str(self.url_pattern), str(self.base_url))
+            self.getting_links_url_r("" , str(self.url), str(self.url_pattern), str(self.base_url))
 
     def getting_links_url_a(self, pageURL, url , url_pattern):
         print "\nWorker Thread Getting Links A from : "+self.url+"\n"
         global pages
+        
         br = mechanize.Browser()
         try:
-            br.open((url+pageURL))
+            br.open((url+pageURL))#at first iteration base url + blank url
             bsObj = BeautifulSoup(br.response(), "lxml")
             for link in bsObj.findAll("a", href=re.compile(url_pattern)):
                if 'href' in link.attrs:
@@ -114,15 +114,18 @@ class spidy_worker(QThread):
             print e 
 
 
-    def getting_links_url_b(self, pageURL, url , url_pattern, base_url):
-        print "\nWorker Thread Getting Links B Current URL : "+(url+pageURL)+"\n"
+    def getting_links_url_r(self, pageURL, url , url_pattern, base_url):
         global pages
         br = mechanize.Browser()
-       
+                            
         br.set_handle_robots(False)
-        try:            
+        try:
             br = mechanize.Browser()
-            br.open((url+pageURL))
+            if len(pages) == 0:
+                print "Page Len :-> "+len(pages)
+                br.open((url))
+            else:
+                br.open((base_url+pageURL[1:]))
             bsObj = BeautifulSoup(br.response(), "lxml")
             for link in bsObj.findAll("a"):
                 if 'href' in link.attrs:
@@ -143,7 +146,7 @@ class spidy_worker(QThread):
                                    
                         #to_text.close()
                         pages.add(newPage)                
-                        self.getting_links_url_b(newPage, url, url_pattern)
+                        self.getting_links_url_r(newPage, url, url_pattern, base_url)
              
         except Exception as e:
             print e
