@@ -101,37 +101,35 @@ class spidy_worker(QThread):
 
 
     def getting_links_url_b(self, pageURL, url , url_pattern):
-        print "Worker Thread Getting Links B"
+        print "\nWorker Thread Getting Links B Current URL : "+(url+pageURL)+"\n"
         global pages
         br = mechanize.Browser()
-        br.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 5.1; rv:14.0) Gecko/20100101 Firefox/14.0.1')]
-        try:
-            br.open((url+pageURL))
-            print url+pageURL
+       
+        br.set_handle_robots(False)
+        try:            
+            br = mechanize.Browser()
+            br.open((url+pageURL))   
             bsObj = BeautifulSoup(br.response(), "lxml")
-            print bsObj.prettify().encode("utf-8")
-            """
             for link in bsObj.findAll("a"):
-               if 'href' in link.attrs:
-                   if link.attrs['href'] not in pages:
-                       #to_text = open(file_name, 'a')
-                       newPage = link.attrs['href']
-                       if url not in newPage:
-                           to_be_written = url+newPage[1:]+'\n'
-                       elif url in newPage:
-                           to_be_written = newPage+'\n'
-                       print to_be_written
-                       if url_pattern in newPage:
-                           to_result = '\nLink found ----->\n\n'+newPage
-                       print to_result
-                       #to_text.writelines((newPage+"\n"))                     
-                       #to_text.close()
-                       pages.add(newPage)
-                       self.getting_links_url_a(newPage, url, url_pattern)    
-                   else:
-                       return;
-               else:
-                   return;
-               """                
+                if 'href' in link.attrs:
+                    if link.attrs['href'] not in pages:
+                        #We have encountered a new page
+                        #to_text = open(file_name, 'a')
+                        newPage = link.attrs['href']                    
+                        
+                        if url not in newPage:
+                            to_be_written = url+newPage[1:]+'\n'
+                        elif url in newPage:
+                            to_be_written = newPage+'\n'
+                                                
+                        print "\nCrawled : "+to_be_written+"\n"                           
+                        if url_pattern in to_be_written:
+                            print '\nLink found ----->\n\n'+to_be_written            
+                            #to_text.writelines(to_be_written)
+                                   
+                        #to_text.close()
+                        pages.add(newPage)                
+                        self.getting_links_url_b(newPage, url, url_pattern)
+             
         except Exception as e:
             print e
