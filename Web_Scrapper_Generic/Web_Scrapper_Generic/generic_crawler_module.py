@@ -9,9 +9,11 @@ pages = set()
 class spidy(object):
 
     def __init__(self):
+        #self.status_msgs_listWidget.addItem("Initializing")
         print "Initializing"
 
     def get_links(self):
+        self.status_msgs_listWidget.addItem("Get Links Function")
         print "Get Links Function"
         self.url_lineEdit.setPlaceholderText("Enter URL ")
         self.url_pattern_lineEdit.setPlaceholderText("Enter URL pattern")
@@ -24,6 +26,7 @@ class spidy(object):
         self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)
         
     def url_type_a(self):
+        self.status_msgs_listWidget.addItem("Type: Absolute Selected")
         self.url = str(self.url_lineEdit.text())
         self.url_pattern = str(self.url_pattern_lineEdit.text())
         self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
@@ -32,8 +35,10 @@ class spidy(object):
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
         self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+        self.connect(self.spidy_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
 
     def url_type_r(self):
+        self.status_msgs_listWidget.addItem("Type: Relative Selected")
         self.url = str(self.url_lineEdit.text()).strip("")
         self.url_pattern = str(self.url_pattern_lineEdit.text())
         self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
@@ -43,12 +48,15 @@ class spidy(object):
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
         self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+        self.connect(self.spidy_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
 
     def stop_crawler_button(self):
+        self.status_msgs_listWidget.addItem("Stopping Crawler")
         print "Stopping Crawler"
         self.spidy_object.terminate()
 
     def load_configuration_button(self):
+        self.status_msgs_listWidget.addItem("Loading Configuration")
         print "Loading Configuration"
         file = open("config.txt", "r")
         str(self.url_lineEdit.setText(file.readline()))
@@ -56,6 +64,7 @@ class spidy(object):
         file.close()
 
     def save_configuration_button(self):
+        self.status_msgs_listWidget.addItem("Saving Configuration")
         print "Saving Configuration"
         file = open("config.txt", "w")
         file.write(str(self.url_lineEdit.text())+"\n")
@@ -65,9 +74,13 @@ class spidy(object):
     def result_crawled_links_listWidget(self, add_to_list):
         self.crawled_links_listWidget.addItem(add_to_list)        
 
+    def status_msg_listWidget(self, msg):
+        self.status_msgs_listWidget.addItem(msg)
+
 class spidy_worker(QThread):
     def __init__(self, url, url_pattern, url_type, base_url, file_name):
         QThread.__init__(self)
+        self.emit(SIGNAL("status_msg_listWidget(QString)"), "Spidy Initializing")
         print "Spidy Initializing"
         self.url = url
         self.url_pattern = url_pattern
@@ -76,6 +89,7 @@ class spidy_worker(QThread):
         self.file_name = file_name
 
     def run(self):
+        self.emit(SIGNAL("status_msg_listWidget(QString)"), "Running Thread , Starting Crawler")
         print "Running Thread"
         print "URL : "+self.url
         print "URL Pattern : "+self.url_pattern
