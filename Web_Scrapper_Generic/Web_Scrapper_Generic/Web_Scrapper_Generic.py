@@ -22,7 +22,7 @@ def main():
     scrapper = Web_Scrapper_Generic()
     scrapper.show()
     extractor = Extactor()
-    QtCore.QObject.connect(scrapper.data_extraction_pushButton, QtCore.SIGNAL("extractor.show()"), extractor.show)
+    QtCore.QObject.connect(scrapper.data_extraction_pushButton, QtCore.SIGNAL("clicked()"), extractor.show)
     app.exec_()
 
 if __name__ == "__main__":
