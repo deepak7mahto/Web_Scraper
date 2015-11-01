@@ -8,10 +8,6 @@ pages = set()
 
 class spidy(object):
 
-    def __init__(self):
-        #self.status_msgs_listWidget.addItem("Initializing")
-        print "Initializing"
-
     def get_links(self):
         self.status_msgs_listWidget.addItem("Get Links Function")
         print "Get Links Function"
