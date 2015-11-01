@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui, Qt
+﻿from PyQt4 import QtCore, QtGui, Qt
 import Web_Scrapper_Generic_UI, sys, generic_crawler_module
 
 class Web_Scrapper_Generic(QtGui.QMainWindow, Web_Scrapper_Generic_UI.Ui_MainWindow, generic_crawler_module.spidy):
@@ -17,3 +17,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#hello
