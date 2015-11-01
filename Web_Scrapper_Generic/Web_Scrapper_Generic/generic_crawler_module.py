@@ -9,43 +9,40 @@ pages = set()
 class spidy(object):
 
     def __init__(self):
-        print "initializing"
+        print "Initializing"
 
     def get_links(self):
-        print "get links function"
+        print "Get Links Function"
         self.url_lineEdit.setPlaceholderText("Enter URL ")
-        self.url_pattern_lineEdit.setPlaceholderText("Enter URL pattern")        
-               
+        self.url_pattern_lineEdit.setPlaceholderText("Enter URL pattern")
+        self.file_name_lineEdit.setPlaceholderText("Enter File Name")
+        
         self.connect(self.actionSave_Configuration_File, SIGNAL("triggered()"), self.save_configuration_button)
         self.connect(self.actionLoad_Configuration_File, SIGNAL("triggered()"), self.load_configuration_button)
 
         self.connect(self.absolute_url_radioButton , SIGNAL("clicked()"), self.url_type_a)
-        self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)        
-
+        self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)
+        
     def url_type_a(self):
-        self.url = self.url_lineEdit.text()
-        self.url_pattern = self.url_pattern_lineEdit.text()
-        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeA", "")
+        self.url = str(self.url_lineEdit.text())
+        self.url_pattern = str(self.url_pattern_lineEdit.text())
+        self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
+        self.file_name = str(self.file_name_lineEdit.text())
+        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeA", "", self.file_name)
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
-        
+        self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+
     def url_type_r(self):
-
-        #self.base_url_button_label = QtGui.QLabel()
-        #self.base_url_button_label.setText("Base URL")
-        
-        #self.base_url_button_lineEdit = QtGui.QLineEdit()
-        #self.base_url_button_lineEdit.setPlaceholderText("Enter Base URL")
-        
-        #self.gridLayout.addWidget(self.base_url_button_label, 0, 2, 1, 1)
-        #self.gridLayout.addWidget(self.base_url_button_lineEdit, 1, 2, 1, 1)        
-
         self.url = str(self.url_lineEdit.text()).strip("")
-        self.url_pattern = self.url_pattern_lineEdit.text()
-        self.base_url = urlparse.urlparse(str(self.url)).hostname
-        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeB", self.base_url)
+        self.url_pattern = str(self.url_pattern_lineEdit.text())
+        self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
+        self.file_name = str(self.file_name_lineEdit.text())
+        self.base_url = str(urlparse.urlparse(str(self.url)).hostname)
+        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeR", self.base_url, self.file_name)
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
+        self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
 
     def stop_crawler_button(self):
         print "Stopping Crawler"
@@ -65,88 +62,93 @@ class spidy(object):
         file.write(str(self.url_pattern_lineEdit.text()))
         file.close()
 
+    def result_crawled_links_listWidget(self, add_to_list):
+        self.crawled_links_listWidget.addItem(add_to_list)        
+
 class spidy_worker(QThread):
-    def __init__(self, url, url_pattern, url_type, base_url):
+    def __init__(self, url, url_pattern, url_type, base_url, file_name):
         QThread.__init__(self)
         print "Spidy Initializing"
         self.url = url
         self.url_pattern = url_pattern
         self.url_type = url_type
         self.base_url = base_url
+        self.file_name = file_name
 
     def run(self):
         print "Running Thread"
-        print "URL : "+str(self.url)
-        print "URL Pattern : "+str(self.url_pattern)
-        print "URL Type : "+str(self.url_type)
-        print "Base URl : "+str(self.base_url)
+        print "URL : "+self.url
+        print "URL Pattern : "+self.url_pattern
+        print "URL Type : "+self.url_type
+        print "Base URl : "+self.base_url
+        print "File Name : "+self.file_name
 
         if self.url_type == "typeA":
-            self.getting_links_url_a("" , str(self.url), str(self.url_pattern))
-        elif self.url_type == "typeB":
-            self.getting_links_url_r("" , str(self.url), str(self.url_pattern), str(self.base_url))
+            self.getting_links_url_a("" , self.url, self.url_pattern, self.file_name)
+        elif self.url_type == "typeR":
+            self.getting_links_url_r("" , self.url, self.url_pattern, self.base_url, self.file_name)
 
-    def getting_links_url_a(self, pageURL, url , url_pattern):
-        print "\nWorker Thread Getting Links A from : "+self.url+"\n"
+    def getting_links_url_a(self, pageURL, url , url_pattern, file_name):
         global pages
-        
         br = mechanize.Browser()
         try:
-            br.open((url+pageURL))#at first iteration base url + blank url
+            br.open((url+pageURL))
             bsObj = BeautifulSoup(br.response(), "lxml")
             for link in bsObj.findAll("a", href=re.compile(url_pattern)):
                if 'href' in link.attrs:
                    if link.attrs['href'] not in pages:
-                       #to_text = open(file_name, 'a')
+                       to_text = open(file_name, "a")
                        newPage = link.attrs['href']
-                       to_result = '\nLink found ----->\n\n'+newPage
-                       print to_result
-                       #to_text.writelines((newPage+"\n"))                     
-                       #to_text.close()
+                       to_result = newPage
+                       self.emit(SIGNAL("result_crawled_links_listWidget(QString)"), to_result)
+                       print '\nLink found ----->\n\n'+to_result
+                       to_text.writelines(newPage+"\n")
+                       to_text.close()
                        pages.add(newPage)
-                       self.getting_links_url_a(newPage, "", url_pattern)    
+                       self.getting_links_url_a(newPage, "", url_pattern, file_name)
                    else:
                        return;
                else:
                    return;
-                               
         except Exception as e:
-            print e 
+            print e
 
-
-    def getting_links_url_r(self, pageURL, url , url_pattern, base_url):
+    def getting_links_url_r(self, pageURL, url , url_pattern, base_url, file_name):
         global pages
+        print str(file_name)
+
         br = mechanize.Browser()
-                            
         br.set_handle_robots(False)
         try:
             br = mechanize.Browser()
             if len(pages) == 0:
-                print "Page Len :-> "+len(pages)
+                print "Page Len :-> "+str(len(pages))
                 br.open((url))
+                print url
             else:
-                br.open((base_url+pageURL[1:]))
+                print "Page Len :-> "+str(len(pages))
+                br.open((r"http://"+base_url+pageURL))
+
             bsObj = BeautifulSoup(br.response(), "lxml")
+
             for link in bsObj.findAll("a"):
+
                 if 'href' in link.attrs:
                     if link.attrs['href'] not in pages:
-                        #We have encountered a new page
-                        #to_text = open(file_name, 'a')
+                        to_text = open(file_name, "a")
                         newPage = link.attrs['href']
-
-                        if url not in newPage:
-                            to_be_written = url+newPage[1:]+'\n'
-                        elif url in newPage:
-                            to_be_written = newPage+'\n'
-                                                
-                        print "\nCrawled : "+to_be_written+"\n"                           
+                        if base_url not in newPage:
+                            to_be_written = r"http://"+base_url+newPage
+                        elif base_url in newPage:
+                            to_be_written = newPage
+                        print "\nCrawled : "+to_be_written+"\n"
                         if url_pattern in to_be_written:
-                            print '\nLink found ----->\n\n'+to_be_written            
-                            #to_text.writelines(to_be_written)
-                                   
-                        #to_text.close()
-                        pages.add(newPage)                
-                        self.getting_links_url_r(newPage, url, url_pattern, base_url)
-             
+                            print '\nLink found ----->\n\n'+to_be_written
+                            self.emit(SIGNAL("result_crawled_links_listWidget(QString)"), to_be_written)
+                            to_text.writelines((to_be_written+"\n"))
+                        to_text.close()
+                        pages.add(newPage)
+                        self.getting_links_url_r(newPage, url, url_pattern, base_url, file_name)
+
         except Exception as e:
             print e
