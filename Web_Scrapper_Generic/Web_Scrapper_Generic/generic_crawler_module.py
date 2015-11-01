@@ -46,11 +46,6 @@ class spidy(object):
         self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
         self.connect(self.spidy_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
 
-    def stop_crawler_button(self):
-        self.status_msgs_listWidget.addItem("Stopping Crawler")
-        print "Stopping Crawler"
-        self.spidy_object.terminate()
-
     def load_configuration_button(self):
         self.status_msgs_listWidget.addItem("Loading Configuration")
         print "Loading Configuration"
@@ -67,6 +62,11 @@ class spidy(object):
         file.write(str(self.url_pattern_lineEdit.text()))
         file.close()
 
+    def stop_crawler_button(self):
+        self.status_msgs_listWidget.addItem("Stopping Crawler")
+        print "Stopping Crawler"
+        self.spidy_object.terminate()
+
     def result_crawled_links_listWidget(self, add_to_list):
         self.crawled_links_listWidget.addItem(add_to_list)        
 
@@ -74,6 +74,7 @@ class spidy(object):
         self.status_msgs_listWidget.addItem(msg)
 
 class spidy_worker(QThread):
+
     def __init__(self, url, url_pattern, url_type, base_url, file_name):
         QThread.__init__(self)
         self.emit(SIGNAL("status_msg_listWidget(QString)"), "Spidy Initializing")
@@ -85,6 +86,7 @@ class spidy_worker(QThread):
         self.file_name = file_name
 
     def run(self):
+
         self.emit(SIGNAL("status_msg_listWidget(QString)"), "Running Thread , Starting Crawler")
         print "Running Thread"
         print "URL : "+self.url
