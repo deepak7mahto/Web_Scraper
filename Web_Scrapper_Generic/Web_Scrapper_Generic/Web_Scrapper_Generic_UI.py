@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(759, 485)
+        MainWindow.resize(759, 428)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.groupBox = QtGui.QGroupBox(self.centralwidget)
@@ -105,11 +105,6 @@ class Ui_MainWindow(object):
         self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_2.setObjectName(_fromUtf8("line_2"))
         self.gridLayout.addWidget(self.line_2, 1, 2, 1, 1)
-        self.main_progressBar = QtGui.QProgressBar(self.centralwidget)
-        self.main_progressBar.setGeometry(QtCore.QRect(10, 390, 741, 41))
-        self.main_progressBar.setProperty("value", 0)
-        self.main_progressBar.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_progressBar.setObjectName(_fromUtf8("main_progressBar"))
         self.groupBox_5 = QtGui.QGroupBox(self.centralwidget)
         self.groupBox_5.setGeometry(QtCore.QRect(10, 110, 511, 151))
         self.groupBox_5.setObjectName(_fromUtf8("groupBox_5"))
