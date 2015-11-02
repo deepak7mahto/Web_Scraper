@@ -6,7 +6,7 @@ import Web_Scrapper_Generic_UI, lxml, re, urlparse
 
 pages = set()
 
-class spidy(object):
+class generic_crawler_class(object):
 
     def get_links(self):
         self.status_msgs_listWidget.addItem("Get Links Function")
@@ -27,11 +27,11 @@ class spidy(object):
         self.url_pattern = str(self.url_pattern_lineEdit.text())
         self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
         self.file_name = str(self.file_name_lineEdit.text())
-        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeA", "", self.file_name)
-        self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
+        self.generic_crawler_class_object = generic_crawler_class_worker(self.url, self.url_pattern, "typeA", "", self.file_name)
+        self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.generic_crawler_class_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
-        self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
-        self.connect(self.spidy_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
+        self.connect(self.generic_crawler_class_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+        self.connect(self.generic_crawler_class_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
 
     def url_type_r(self):
         self.status_msgs_listWidget.addItem("Type: Relative Selected")
@@ -40,11 +40,13 @@ class spidy(object):
         self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
         self.file_name = str(self.file_name_lineEdit.text())
         self.base_url = str(urlparse.urlparse(str(self.url)).hostname)
-        self.spidy_object = spidy_worker(self.url, self.url_pattern, "typeR", self.base_url, self.file_name)
-        self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.spidy_object.start)
+        self.generic_crawler_class_object = generic_crawler_class_worker(self.url, self.url_pattern, "typeR", self.base_url, self.file_name)
+        self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.generic_crawler_class_object.start)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
-        self.connect(self.spidy_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
-        self.connect(self.spidy_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
+        self.connect(self.generic_crawler_class_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+        self.connect(self.generic_crawler_class_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
+        self.emit(SIGNAL("data_emitting(QString)"), self.file_name)
+
 
     def load_configuration_button(self):
         self.status_msgs_listWidget.addItem("Loading Configuration")
@@ -65,7 +67,7 @@ class spidy(object):
     def stop_crawler_button(self):
         self.status_msgs_listWidget.addItem("Stopping Crawler")
         print "Stopping Crawler"
-        self.spidy_object.terminate()
+        self.generic_crawler_class_object.terminate()
 
     def result_crawled_links_listWidget(self, add_to_list):
         self.crawled_links_listWidget.addItem(add_to_list)        
@@ -73,12 +75,12 @@ class spidy(object):
     def status_msg_listWidget(self, msg):
         self.status_msgs_listWidget.addItem(msg)
 
-class spidy_worker(QThread):
+class generic_crawler_class_worker(QThread):
 
     def __init__(self, url, url_pattern, url_type, base_url, file_name):
         QThread.__init__(self)
-        self.emit(SIGNAL("status_msg_listWidget(QString)"), "Spidy Initializing")
-        print "Spidy Initializing"
+        self.emit(SIGNAL("status_msg_listWidget(QString)"), "generic_crawler_class Initializing")
+        print "generic_crawler_class Initializing"
         self.url = url
         self.url_pattern = url_pattern
         self.url_type = url_type
@@ -86,7 +88,6 @@ class spidy_worker(QThread):
         self.file_name = file_name
 
     def run(self):
-
         self.emit(SIGNAL("status_msg_listWidget(QString)"), "Running Thread , Starting Crawler")
         print "Running Thread"
         print "URL : "+self.url
@@ -94,6 +95,7 @@ class spidy_worker(QThread):
         print "URL Type : "+self.url_type
         print "Base URl : "+self.base_url
         print "File Name : "+self.file_name
+
 
         if self.url_type == "typeA":
             self.getting_links_url_a("" , self.url, self.url_pattern, self.file_name)
