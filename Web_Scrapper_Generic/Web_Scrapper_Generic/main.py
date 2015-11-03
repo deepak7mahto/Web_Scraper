@@ -6,20 +6,32 @@ class Web_Scrapper_Generic(QtGui.QMainWindow, Web_Scrapper_Generic_UI.Ui_MainWin
     #initialization of main  windows    
     def __init__(self):
         super(Web_Scrapper_Generic, self).__init__()
+       #The super() method returns the parent object of the Example class and we call its constructor.
+       # The __init__() method is a constructor method in Python.
         self.setupUi(self)
+       #The creation of the GUI is the responsibility of initUI() method.
         self.get_links()
-
+       #calling the get_links() function 
 class Extactor(QtGui.QDialog, Data_extactor_UI.Ui_Form, data_extractor_module.extractor_main_class):
     def __init__(self):
+        #The super() method returns the parent object of the Example class and we call its constructor.
+        # The __init__() method is a constructor method in Python.
         super(Extactor, self).__init__()
         self.setupUi(self)
+        #The creation of the GUI is the responsibility of initUI() method.
         self.get_data()
+        #calling the get_dat() functionn 
         
 class Mailing(QtGui.QDialog, Mailing_UI.Ui_mailing_dialog, mailing_module.mailing_main_class):
     def __init__(self, *args):
+        #The super() method returns the parent object of the Example class and we call its constructor.
+        # The __init__() method is a constructor method in Python.
         super(Mailing, self).__init__()
+        #The creation of the GUI is the responsibility of initUI() method
         self.setupUi(self)
+        #The creation of the GUI is the responsibility of initUI() method.
         self.mailing()
+        #calling the mailing function 
 
 def main():
     app = QtGui.QApplication(sys.argv)
@@ -30,23 +42,21 @@ def main():
     scrapper.show()
     #The show() method displays the window on the screen. A window is first created in memory and later shown on the screen. 
     extractor = Extactor()
-    #the object for tje class eExtractor is created 
+    #the object for the class Extractor is created 
     mailer = Mailing()
+    #the object for the class Mailing  is created
     QtCore.QObject.connect(scrapper.data_extraction_pushButton, QtCore.SIGNAL("clicked()"), extractor.show)
     QtCore.QObject.connect(scrapper.mailing_pushButton, QtCore.SIGNAL("clicked()"), mailer.show)
     app.exec_()
-    """
-     the mainloop of the application. is entered as soon as the object of te class is created
-     The event handling starts from this point. The mainloop receives events from the window system and dispatches 
-     them to the application widgets. 
-     The mainloop ends if we call the exit() method or the main window is destroyed. 
-     The environment will be informed how the application ended .
-     The exec_() method has an underscore. It is because the exec is a Python keyword. And thus exec_() was used instead.    
-    """
+    
+     # the mainloop of the application. is entered as soon as the object of te class is created
+     #The event handling starts from this point. The mainloop receives events from the window system and dispatches 
+     #them to the application widgets. 
+     #The mainloop ends if we call the exit() method or the main window is destroyed. 
+     #The environment will be informed how the application ended .
+     #The exec_() method has an underscore. It is because the exec is a Python keyword. And thus exec_() was used instead.    
+    
 
 if __name__ == "__main__":
     main()
-
-#hello fro aditya1223
-#hello fro aditya
-#hello from dpk
+    #calling the main() function 
