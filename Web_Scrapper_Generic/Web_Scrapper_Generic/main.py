@@ -11,6 +11,7 @@ class Web_Scrapper_Generic(QtGui.QMainWindow, Web_Scrapper_Generic_UI.Ui_MainWin
         self.setupUi(self)
        #The creation of the GUI is the responsibility of initUI() method.
         self.get_links()
+        
        #calling the get_links() function 
 class Extactor(QtGui.QDialog, Data_extactor_UI.Ui_Form, data_extractor_module.extractor_main_class):
     def __init__(self):
