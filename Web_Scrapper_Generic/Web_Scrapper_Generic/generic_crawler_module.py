@@ -10,7 +10,6 @@ pages = set()
 class generic_crawler_class(object):
     # the crawler class
     def get_links(self):
-        QtCore.QObject.connect(
         #function is used to get links from the GUI 
         self.status_msgs_listWidget.addItem("Get Links Function")
         #to show the message in the  list Widget  

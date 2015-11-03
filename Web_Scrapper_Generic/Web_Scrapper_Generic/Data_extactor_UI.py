@@ -130,7 +130,7 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Data Extarctor", None))
         self.groupBox.setTitle(_translate("Form", "Load Links File", None))
         self.load_file_pushButton.setText(_translate("Form", "Load File", None))
-        self.groupBox_2.setTitle(_translate("Form", "Enetr Details of Extaction", None))
+        self.groupBox_2.setTitle(_translate("Form", "Enter Details of Extaction", None))
         self.column_names_lineEdit.setPlaceholderText(_translate("Form", "Enter Colum Item Names", None))
         self.css_selector_lineEdit.setPlaceholderText(_translate("Form", "Enter Corresponding CSS Selector", None))
         self.add_item_pushButton.setText(_translate("Form", "Add Item", None))
