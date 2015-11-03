@@ -51,6 +51,7 @@ class extractor_main_class(object):
         self.extractor_worker_object = extractor_main_class_worker(column_name_list, css_selectors_list, css_list_num, self.file_)
         self.extractor_worker_object.start()
         self.connect(self.extractor_worker_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
+        self.connect(self.stop_extraction_pushButton_2, SIGNAL("clicked()"), self.extractor_worker_object.terminate)
 
     
     def load_extractor_configuration_button(self):
