@@ -29,6 +29,9 @@
     <Compile Include="examples\e1.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="examples\e2.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="generic_crawler_module.py">
       <SubType>Code</SubType>
     </Compile>
