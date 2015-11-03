@@ -1,3 +1,3 @@
-class mailing_module(object):
+class mailing_main_class(object):
     """description of class"""
     
