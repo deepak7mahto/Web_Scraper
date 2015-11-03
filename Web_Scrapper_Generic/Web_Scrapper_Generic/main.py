@@ -11,14 +11,16 @@ class Web_Scrapper_Generic(QtGui.QMainWindow, Web_Scrapper_Generic_UI.Ui_MainWin
         self.setupUi(self)
        #The creation of the GUI is the responsibility of initUI() method.
         self.get_links()
+       #calling the get_links() function
+        self.setWindowIcon(QtGui.QIcon('favicon.ico'))
 
+        self.connect(self.actionAbout, QtCore.SIGNAL("triggered()"), self.about_function)
 
-        QtCore.QObject.connect(self.actionAbout, QtCore.SIGNAL("triggered()"), self.about_function)
     def about_function(self):
         msgBox = QtGui.QMessageBox()
         msgBox.information(self, "About Us", "Team ADTH")
+                
         
-       #calling the get_links() function 
 class Extactor(QtGui.QDialog, Data_extactor_UI.Ui_Form, data_extractor_module.extractor_main_class):
     def __init__(self):
         #The super() method returns the parent object of the Example class and we call its constructor.
@@ -58,6 +60,7 @@ def main():
     QtCore.QObject.connect(scrapper.mailing_pushButton, QtCore.SIGNAL("clicked()"), mailer.show)
     QtCore.QObject.connect(scrapper.actionData_Extraction, QtCore.SIGNAL("triggered()"), extractor.show)
     QtCore.QObject.connect(scrapper.actionMailing, QtCore.SIGNAL("triggered()"), mailer.show)
+    #scrapper.setWindowIcon("favicon.ico")
     app.exec_()
     
      # the mainloop of the application. is entered as soon as the object of te class is created
