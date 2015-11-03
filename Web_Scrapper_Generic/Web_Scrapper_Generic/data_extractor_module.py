@@ -39,12 +39,15 @@ class extractor_main_class(object):
         css_list_num = []
         for x in range(50):
             try:
-                column_name_list.append(str(self.show_coloumn_name_listWidget.item(x).text()))
-                css_selectors_list.append(str(self.show_css_selectors_listWidget.item(x).text())) 
-                css_list_num.append(str(self.show_css_num_listWidget.item(x).text()))
+                column_name_list.append(str(self.show_coloumn_name_listWidget.item(x).text()).strip("\n"))
+                css_selectors_list.append(str(self.show_css_selectors_listWidget.item(x).text()).strip("\n")) 
+                css_list_num.append(str(self.show_css_num_listWidget.item(x).text()).strip("\n"))
             except:
                 continue
             print "Loop Counter "+str(x)
+        css_selectors_list = filter(None, css_selectors_list)
+        column_name_list = filter(None, column_name_list)
+        css_list_num = filter(None, css_list_num)
         self.extractor_worker_object = extractor_main_class_worker(column_name_list, css_selectors_list, css_list_num, self.file_)
         self.extractor_worker_object.start()
         self.connect(self.extractor_worker_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
@@ -55,13 +58,12 @@ class extractor_main_class(object):
             self.status_msgs_listWidget.addItem("Loading Configuration")
             print "Loading Configuration"
             file = open("extractor_config.txt", "r")
-            self.column_names_lineEdit.text(file.readline())
-            self.css_selector_lineEdit.text(file.readline())
+            file.seek(0)
             for x in range(50):
                 try:
-                    self.show_coloumn_name_listWidget.addItem(file.readline())
-                    self.show_css_selectors_listWidget.addItem(file.readline())
-                    self.show_css_num_listWidget.addItem(file.readline())
+                    self.show_coloumn_name_listWidget.addItem(str(file.readline()).strip("\n"))
+                    self.show_css_selectors_listWidget.addItem(str(file.readline()).strip("\n"))
+                    self.show_css_num_listWidget.addItem(str(file.readline()).strip("\n"))
                 except:
                     continue
                 print "Loop Counter "+str(x)
@@ -72,8 +74,6 @@ class extractor_main_class(object):
     def save_extractor_configuration_button(self):
         try:
             file = open("extractor_config.txt", "w")
-            file.write(str(self.column_names_lineEdit.text())+"\n")
-            file.write(str(self.css_selector_lineEdit.text())+"\n")
             for x in range(50):
                 try:
                     file.write(str(self.show_coloumn_name_listWidget.item(x).text())+"\n")
@@ -123,14 +123,10 @@ class extractor_main_class_worker(QThread):
                 try:
                     br.open(link1)
                     bsObj = BeautifulSoup(br.response(), 'lxml')
-                    self.emit(SIGNAL("status_msg_listWidget(QString)"), str(css_selectors_list))
                     print str(css_selectors_list)
                     row_list = []
                     for text, num in zip(css_selectors_list, css_list_num):
-                        t1 = bsObj.select(text)[int(num)].get_text().strip().encode("utf-8")
-                        row_list.append(t1)
-                        print t1
-                    print str(row_list)
+                        row_list.append(bsObj.select(text)[int(num)].get_text().strip().encode("utf-8"))
                     csv_writer.writerow((row_list))
                     row += 1
                     self.emit(SIGNAL("status_msg_listWidget(QString)"), "Done CSV Writing for -->\n"+row_list[0])
