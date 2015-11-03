@@ -21,6 +21,8 @@ class Mailing(QtGui.QDialog, Mailing_UI.Ui_mailing_dialog, mailing_module.mailin
         self.setupUi(self)
         self.mailing()
 
+
+
 def main():
     app = QtGui.QApplication(sys.argv)
     #Every PyQt4 application must create an application object. The application object is located in the QtGui module
@@ -34,6 +36,9 @@ def main():
     mailer = Mailing()
     QtCore.QObject.connect(scrapper.data_extraction_pushButton, QtCore.SIGNAL("clicked()"), extractor.show)
     QtCore.QObject.connect(scrapper.mailing_pushButton, QtCore.SIGNAL("clicked()"), mailer.show)
+    QtCore.QObject.connect(scrapper.actionData_Extraction, QtCore.SIGNAL("triggered()"), extractor.show)
+    QtCore.QObject.connect(scrapper.actionMailing, QtCore.SIGNAL("triggered()"), mailer.show)
+    
     app.exec_()
     """
      the mainloop of the application. is entered as soon as the object of te class is created

@@ -16,8 +16,8 @@ class mailing_main_class(object):
         print "Starting Mailing System "
         self.sendto_textEdit_emailtab.setText("deepak7mahto@gmail.com,krhemant.cool@gmail.com,tushar.kashyap619@gmail.com,urbancod3r@gmail.com,gta267@gmail.com, shalutyagi47@yahoo.com,leovarsha.chaudhary1993@gmail.com,adityabhel93@gmail.com,prn826@gmail.com,scrapperweb@gmail.com")
         self.add_text_message_textEdit_emailtab.setText("Please find the attachment")        
-        self.select_file_lineEdit_emailtab.setText("naukaridotcomfile.csv")
-        self.select_file_lineEdit_emailtab_2.setText("naukaridotcomlinks.txt")
+        self.select_file_lineEdit_emailtab.setPlaceholderText("Select CSV File Using Selct Button")
+        self.select_file_lineEdit_emailtab_2.setPlaceholderText("Select Links File Using Selct Button")
         self.connect(self.send_mail_pushButton_emailtab, QtCore.SIGNAL("clicked()"), self.mailing_operation)
         self.connect(self.select_file_pushButton_emailtab, QtCore.SIGNAL("pressed()"), self.getting_file_name_emailtab)
         self.connect(self.select_file_pushButton_emailtab_2, QtCore.SIGNAL("pressed()"), self.getting_file_name_emailtab_2)       
@@ -70,8 +70,8 @@ class EmailTab_worker_thread_mailing(QtCore.QThread):
         self.mailing_function(self.to_address_list, self.text_to_be_added, self.file_name1, self.file_name2)
 
     def mailing_function(self, to_address_list, text_to_be_added, file_name1, file_name2):
-        self.username = "scrapperweb@gmail.com"
-        self.password = "adth@web"
+        self.username = raw_input("Enter Email ID -> ")
+        self.password = raw_input("Enter Password -> ")
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
         try:
@@ -104,6 +104,6 @@ class EmailTab_worker_thread_mailing(QtCore.QThread):
             server.quit()
             print "Mail Sent"
             self.emit(QtCore.SIGNAL("status_msg_emailtab(QString)"), "Mail Sent")
-            self.terminate()        
+       
         except Exception as e:
             self.emit(QtCore.SIGNAL("status_msg_emailtab(QString)"), str(e))
