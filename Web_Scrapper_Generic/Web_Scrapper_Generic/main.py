@@ -19,8 +19,7 @@ class Mailing(QtGui.QDialog, Mailing_UI.Ui_mailing_dialog, mailing_module.mailin
     def __init__(self, *args):
         super(Mailing, self).__init__()
         self.setupUi(self)
-
-
+        self.mailing()
 
 def main():
     app = QtGui.QApplication(sys.argv)
@@ -32,9 +31,9 @@ def main():
     #The show() method displays the window on the screen. A window is first created in memory and later shown on the screen. 
     extractor = Extactor()
     #the object for tje class eExtractor is created 
-    mailing = Mailing()
+    mailer = Mailing()
     QtCore.QObject.connect(scrapper.data_extraction_pushButton, QtCore.SIGNAL("clicked()"), extractor.show)
-    QtCore.QObject.connect(scrapper.mailing_pushButton, QtCore.SIGNAL("clicked()"), mailing.show)
+    QtCore.QObject.connect(scrapper.mailing_pushButton, QtCore.SIGNAL("clicked()"), mailer.show)
     app.exec_()
     """
      the mainloop of the application. is entered as soon as the object of te class is createdThe event handling starts from this point. The mainloop receives events from the window system and dispatches them to the application widgets. The mainloop ends if we call the exit() method or the main widget is destroyed. The sys.exit() method ensures a clean exit. The environment will be informed how the application ended .The exec_() method has an underscore. It is because the exec is a Python keyword. And thus, exec_() was used instead.    
