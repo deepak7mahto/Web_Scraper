@@ -1,73 +1,122 @@
-from PyQt4 import Qt, QtCore, QtGui
+﻿from PyQt4 import Qt, QtCore, QtGui
 from PyQt4.QtCore import SIGNAL, QThread
 import mechanize
 from bs4 import BeautifulSoup
 import Web_Scrapper_Generic_UI, lxml, re, urlparse
 
 pages = set()
+#set is a data structure which accepts unique values it is required here because we want only unique link at every crawling cycles 
 
 class generic_crawler_class(object):
-
+    # the crawler class
     def get_links(self):
+        QtCore.QObject.connect(
+        #function is used to get links from the GUI 
         self.status_msgs_listWidget.addItem("Get Links Function")
+        #to show the message in the  list Widget  
         print "Get Links Function"
+        #to print on the console 
         self.url_lineEdit.setPlaceholderText("Enter URL ")
+        #to place the water mark text in the box where we have to enter the url 
         self.url_pattern_lineEdit.setPlaceholderText("Enter URL pattern")
+        #to place the water mark text in the box where we have to enter the url
         self.file_name_lineEdit.setPlaceholderText("Enter File Name")
-        
+        #to place the water mark text in the box where we have to enter the file name 
         self.connect(self.actionSave_Configuration_File, SIGNAL("triggered()"), self.save_configuration_button)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.actionLoad_Configuration_File, SIGNAL("triggered()"), self.load_configuration_button)
-
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
+        #The sender is an object that sends a signal. The receiver is the object that receives the signal. The slot is the method that reacts to the signal.
+        #A signal is emitted when a particular event occurs A slot can be any Python callable. A slot is called when a signal connected to it is emitted
         self.connect(self.absolute_url_radioButton , SIGNAL("clicked()"), self.url_type_a)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.relative_url_radioButton , SIGNAL("clicked()"), self.url_type_r)
-        
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever )
+
     def url_type_a(self):
+        #called when the Absolute button is selected 
         self.status_msgs_listWidget.addItem("Type: Absolute Selected")
+        #it displays the message in the status message dailog box .
         self.url = str(self.url_lineEdit.text())
+        #fetch the url from the url box and convert it to the string 
         self.url_pattern = str(self.url_pattern_lineEdit.text())
+        #fetch the url_pattern from the url_pattern and convert it to the string 
         self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
+        #the file will be named as the domain name of the target and the extention to the file will be given as the .txt
         self.file_name = str(self.file_name_lineEdit.text())
+        #set the file_name to file_name_lineEdit.text() 
         self.generic_crawler_class_object = generic_crawler_class_worker(self.url, self.url_pattern, "typeA", "", self.file_name)
+        #an object of type generic_crawler_class_worker object is created and the above initialised elements are passed to it 
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.generic_crawler_class_object.start)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.generic_crawler_class_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.generic_crawler_class_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
-
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
     def url_type_r(self):
+        #data for the relative_url_crawler 
         self.status_msgs_listWidget.addItem("Type: Relative Selected")
+        #it displays the message in the status message dailog box
         self.url = str(self.url_lineEdit.text()).strip("")
+        #to get the relative url
         self.url_pattern = str(self.url_pattern_lineEdit.text())
+        #fetch the url_pattern from the url_pattern and convert it to the string 
         self.file_name_lineEdit.setText(str(str(urlparse.urlparse(str(self.url)).hostname)).strip(".com")+".txt")
+        #the file will be named as the domain name of the target and the extention to the file will be given as the .txt
         self.file_name = str(self.file_name_lineEdit.text())
+        #set the file_name to file_name_lineEdit.text() 
         self.base_url = str(urlparse.urlparse(str(self.url)).hostname)
+        #to get the hostname from the entered url 
         self.generic_crawler_class_object = generic_crawler_class_worker(self.url, self.url_pattern, "typeR", self.base_url, self.file_name)
+        #make an object of crawler typeR that is the relative crawler  
         self.connect(self.start_crawling_pushButton, SIGNAL("clicked()"), self.generic_crawler_class_object.start)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.stop_crawling_pushButton, SIGNAL("clicked()"), self.stop_crawler_button)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.generic_crawler_class_object, SIGNAL("result_crawled_links_listWidget(QString)"), self.result_crawled_links_listWidget)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.connect(self.generic_crawler_class_object, SIGNAL("status_msg_listWidget(QString)"), self.status_msg_listWidget)
+        #self.connect(self.SIGNAL_SENDER,SIGNAL(SIGNAL_TYPE),self.reciever)
         self.emit(SIGNAL("data_emitting(QString)"), self.file_name)
-
+        #to generate the signal 
 
     def load_configuration_button(self):
+        #function to load the configuration file the contains the starting url and the urlpttern
         self.status_msgs_listWidget.addItem("Loading Configuration")
         print "Loading Configuration"
+        #print to the terminal
         file = open("config.txt", "r")
+        #opening the file in the read mode 
         str(self.url_lineEdit.setText(file.readline()))
+        #this set the data in the url dailog box
         str(self.url_pattern_lineEdit.setText(file.readline()))
+        #this sets the data in the url_pattern dailog box 
         file.close()
-
+        #this is done to close the file 
     def save_configuration_button(self):
+        #Function to save the configuration file 
         self.status_msgs_listWidget.addItem("Saving Configuration")
+        #it displays the message in the status message dailog bo
         print "Saving Configuration"
+        #print to the terminal
         file = open("config.txt", "w")
+        #open file in the write mode 
         file.write(str(self.url_lineEdit.text())+"\n")
+        #write url to the configuration file 
         file.write(str(self.url_pattern_lineEdit.text()))
+        #write url_pattern to the configuration file 
         file.close()
-
+        #close the file
     def stop_crawler_button(self):
+       #function to stop the crawler
         self.status_msgs_listWidget.addItem("Stopping Crawler")
+        #it displays the message in the status message dailog box
         print "Stopping Crawler"
+        #print in the terminal
         self.generic_crawler_class_object.terminate()
+        #
 
     def result_crawled_links_listWidget(self, add_to_list):
         self.crawled_links_listWidget.addItem(add_to_list)        
