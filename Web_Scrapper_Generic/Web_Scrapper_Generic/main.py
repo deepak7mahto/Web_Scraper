@@ -36,10 +36,15 @@ def main():
     QtCore.QObject.connect(scrapper.mailing_pushButton, QtCore.SIGNAL("clicked()"), mailer.show)
     app.exec_()
     """
-     the mainloop of the application. is entered as soon as the object of te class is createdThe event handling starts from this point. The mainloop receives events from the window system and dispatches them to the application widgets. The mainloop ends if we call the exit() method or the main widget is destroyed. The sys.exit() method ensures a clean exit. The environment will be informed how the application ended .The exec_() method has an underscore. It is because the exec is a Python keyword. And thus, exec_() was used instead.    
+     the mainloop of the application. is entered as soon as the object of te class is created
+     The event handling starts from this point. The mainloop receives events from the window system and dispatches 
+     them to the application widgets. 
+     The mainloop ends if we call the exit() method or the main window is destroyed. 
+     The environment will be informed how the application ended .
+     The exec_() method has an underscore. It is because the exec is a Python keyword. And thus exec_() was used instead.    
     """
 
 if __name__ == "__main__":
     main()
 
-#hello fro aditya
+#hello fro aditya1223
