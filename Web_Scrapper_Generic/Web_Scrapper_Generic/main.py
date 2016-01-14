@@ -68,8 +68,7 @@ def main():
      #them to the application widgets. 
      #The mainloop ends if we call the exit() method or the main window is destroyed. 
      #The environment will be informed how the application ended .
-     #The exec_() method has an underscore. It is because the exec is a Python keyword. And thus exec_() was used instead.    
-    
+
 
     
 
